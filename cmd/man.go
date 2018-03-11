@@ -46,7 +46,7 @@ to quickly create a Cobra application.`,
 
 		opts := page.GetOptions()
 		for flag, desc := range opts {
-			fmt.Printf("%s %s\n", flag, desc)
+			fmt.Printf("%s: '%s'\n", flag, desc)
 		}
 
 		return nil
@@ -64,6 +64,6 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// manCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	manCmd.Flags().BoolVarP(&manpage.Debug, "debug", "d", false, "Enables debug mode")
 
 }

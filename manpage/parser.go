@@ -10,8 +10,8 @@ import (
 
 var (
 	sectionRx = regexp.MustCompile(`(?i)\A\.(PP|IT|SH)\s?(.*)\z`)
-	trimRx    = regexp.MustCompile(`\\f\w|\.(\w{2})\s?`)
-	flagRx    = regexp.MustCompile(`(?i)\.?FL\s`)
+	trimRx    = regexp.MustCompile(`(?i)\\f\w|\.RS\s\d+|\.(\w{2})\s?|\\|&`)
+	flagTagRx = regexp.MustCompile(`(?i)\.?FL\s`)
 )
 
 var (
@@ -47,8 +47,9 @@ func (p *Parser) GetOptions() map[string]string {
 			continue
 		}
 
-		flag, desc := tag.ToFlag()
-		opts[flag] = desc
+		for flag, desc := range tag.ToFlag() {
+			opts[flag] = desc
+		}
 	}
 
 	return opts
@@ -84,6 +85,9 @@ func (p *Parser) Parse() error {
 		}
 
 		if section != "" {
+			if Debug {
+				fmt.Printf("Appending: %s %#v\n", section, content)
+			}
 			p.tags = append(p.tags, &Tag{Name: section, Content: content})
 		}
 
@@ -101,8 +105,8 @@ func (p *Parser) Parse() error {
 }
 
 func cleanContent(content string) string {
-	content = flagRx.ReplaceAllString(content, "-") // unescape flags
-	content = trimRx.ReplaceAllString(content, "")  // remove extra tags
+	content = flagTagRx.ReplaceAllString(content, "-") // unescape flags
+	content = trimRx.ReplaceAllString(content, "")     // remove extra tags
 
 	return strings.TrimRight(content, " ") // some lines have extra spaces at the end
 }

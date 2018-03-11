@@ -1,7 +1,12 @@
 package manpage
 
 import (
+	"regexp"
 	"strings"
+)
+
+var (
+	flagRx = regexp.MustCompile(`(--?[\w-]+)`)
 )
 
 // Tag represents a tag in the document
@@ -20,6 +25,16 @@ func (t *Tag) IsFlag() bool {
 }
 
 // ToFlag returns the flag and the description
-func (t *Tag) ToFlag() (string, string) {
-	return t.Content[0], strings.Join(t.Content[1:], " ")
+func (t *Tag) ToFlag() map[string]string {
+	result := map[string]string{}
+	flags := strings.Split(t.Content[0], ",")
+	content := strings.Join(t.Content[1:], " ")
+	for _, flag := range flags {
+		matches := flagRx.FindStringSubmatch(flag)
+		if len(matches) > 1 {
+			result[matches[1]] = strings.TrimSpace(content)
+		}
+	}
+
+	return result
 }
