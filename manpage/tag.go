@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	flagRx = regexp.MustCompile(`(--?[\w-]+)`)
+	flagRx       = regexp.MustCompile(`\A(--?[\w-]+)`)
+	subCommandRx = regexp.MustCompile(`\A([a-z_-]+)\z`)
 )
 
 // Tag represents a tag in the document
@@ -15,23 +16,15 @@ type Tag struct {
 	Content []string
 }
 
-// IsFlag returns true if the tag is a flag
-func (t *Tag) IsFlag() bool {
-	if len(t.Content) == 0 {
-		return false
-	}
-
-	return strings.HasPrefix(t.Content[0], "-")
-}
-
-// ToFlag returns the flag and the description
-func (t *Tag) ToFlag() map[string]string {
+// ToOptions returns the flag and the description
+func (t *Tag) ToOptions() map[string]string {
 	result := map[string]string{}
-	flags := strings.Split(t.Content[0], ",")
+	opts := strings.Split(t.Content[0], ",")
 	content := strings.Join(t.Content[1:], " ")
-	for _, flag := range flags {
-		matches := flagRx.FindStringSubmatch(flag)
-		if len(matches) > 1 {
+	for _, opt := range opts {
+		if matches := flagRx.FindStringSubmatch(opt); len(matches) > 1 {
+			result[matches[1]] = strings.TrimSpace(content)
+		} else if matches := subCommandRx.FindStringSubmatch(opt); t.Name == "TP" && len(matches) > 1 {
 			result[matches[1]] = strings.TrimSpace(content)
 		}
 	}

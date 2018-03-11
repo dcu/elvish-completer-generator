@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	sectionRx = regexp.MustCompile(`(?i)\A\.(PP|IT|SH)\s?(.*)\z`)
+	sectionRx = regexp.MustCompile(`(?i)\A\.(PP|IT|SH|TP)\s?(.*)\z`)
 	trimRx    = regexp.MustCompile(`(?i)\\f\w|\.RS\s\d+|\.(\w{2})\s?|\\|&`)
 	flagTagRx = regexp.MustCompile(`(?i)\.?FL\s`)
 )
@@ -40,15 +40,8 @@ func (p *Parser) GetOptions() map[string]string {
 	opts := map[string]string{}
 
 	for _, tag := range p.tags {
-		if !tag.IsFlag() {
-			if Debug && len(tag.Content) > 0 {
-				fmt.Printf("Skipped: %s %#v\n", tag.Name, tag.Content)
-			}
-			continue
-		}
-
-		for flag, desc := range tag.ToFlag() {
-			opts[flag] = desc
+		for opt, desc := range tag.ToOptions() {
+			opts[opt] = desc
 		}
 	}
 
@@ -88,7 +81,7 @@ func (p *Parser) Parse() error {
 			if Debug {
 				fmt.Printf("Appending: %s %#v\n", section, content)
 			}
-			p.tags = append(p.tags, &Tag{Name: section, Content: content})
+			p.tags = append(p.tags, &Tag{Name: strings.ToUpper(section), Content: content})
 		}
 
 		if len(matches) > 1 {
