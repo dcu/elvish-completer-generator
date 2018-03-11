@@ -2,6 +2,7 @@ package manpage
 
 import (
 	"bufio"
+	"compress/gzip"
 	"fmt"
 	"os"
 	"regexp"
@@ -57,8 +58,22 @@ func (p *Parser) Parse() error {
 
 	defer func() { _ = f.Close() }()
 
-	scanner := bufio.NewScanner(f)
+	var scanner *bufio.Scanner
+	if strings.HasSuffix(p.path, ".gz") {
+		rdr, err := gzip.NewReader(f)
+		if err != nil {
+			return err
+		}
+		defer func() { _ = rdr.Close() }()
+		scanner = bufio.NewScanner(rdr)
+	} else {
+		scanner = bufio.NewScanner(f)
+	}
 
+	return p.scanAndProcess(scanner)
+}
+
+func (p *Parser) scanAndProcess(scanner *bufio.Scanner) error {
 	var content []string
 	var section string
 

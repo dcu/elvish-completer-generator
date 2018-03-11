@@ -22,7 +22,6 @@ func TestGetOptionsGitLsFiles(t *testing.T) {
 	c := require.New(t)
 	c.True(true)
 
-	Debug = true
 	p := New("/usr/local/share/man/man1/git-ls-files.1")
 	err := p.Parse()
 	c.Nil(err)
