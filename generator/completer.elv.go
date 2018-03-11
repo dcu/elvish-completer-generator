@@ -26,7 +26,12 @@ fn -is-flag [f]{
     has-prefix $f -
 }
 
-fn compl [@words]{
+fn compl [curr @words]{
+	if (-is-flag curr) {
+		build-flags
+	} else {
+		subcmds
+	}
 }
 
 fn apply {

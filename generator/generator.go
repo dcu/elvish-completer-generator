@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"os"
+	"io"
 	"strconv"
 
 	"github.com/alecthomas/template"
@@ -25,7 +25,7 @@ func New(commandName string, flags []*types.Flag, subCommands []*types.SubComman
 }
 
 // Render renders the completer
-func (g *Generator) Render() error {
+func (g *Generator) Render(writer io.Writer) error {
 	tmpl, err := template.New("completer.elv").Funcs(template.FuncMap{
 		"quote": quote,
 	}).Parse(_templateContent)
@@ -33,7 +33,7 @@ func (g *Generator) Render() error {
 		return err
 	}
 
-	return tmpl.Execute(os.Stdout, g)
+	return tmpl.Execute(writer, g)
 }
 
 func quote(value string) (string, error) {
