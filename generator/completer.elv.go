@@ -27,15 +27,10 @@ fn -is-flag [f]{
 }
 
 fn compl [curr @words]{
-	if (-is-flag curr) {
-		build-flags
-	} else {
-		subcmds
-	}
+	build-flags
+	subcmds
 }
 
-fn apply {
-    edit:completion:arg-completer[{{.CommandName}}] = $compl~
-}
+edit:completion:arg-completer[{{.CommandName}}] = $compl~
 `
 )

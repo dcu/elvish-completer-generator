@@ -17,7 +17,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 
+	"github.com/dcu/elvish-completer-generator/generator"
 	"github.com/dcu/elvish-completer-generator/manpage"
 	"github.com/spf13/cobra"
 )
@@ -45,13 +47,30 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		for _, sc := range page.SubCommands {
-			fmt.Printf("%s        %s\n", sc.Name, sc.Description)
+		if manpage.Debug {
+			for _, sc := range page.SubCommands {
+				fmt.Printf("%s        %s\n", sc.Name, sc.Description)
+			}
+
+			for _, flag := range page.Flags {
+				fmt.Printf("%s        %s\n", flag.Name, flag.Description)
+			}
 		}
 
-		for _, flag := range page.Flags {
-			fmt.Printf("%s        %s\n", flag.Name, flag.Description)
+		fileName := page.Name + "-completer.elv"
+		f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			return err
 		}
+		defer func() { _ = f.Close() }()
+
+		gen := generator.New(page.Name, page.Flags, page.SubCommands)
+		err = gen.Render(f)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("Completer written to %s.\n", fileName)
 
 		return nil
 	},
