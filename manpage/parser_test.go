@@ -14,8 +14,8 @@ func TestGetOptionsCp(t *testing.T) {
 	err := p.Parse()
 	c.Nil(err)
 
-	opts := p.GetOptions()
-	c.True(len(opts) > 0)
+	c.True(len(p.Flags) > 0)
+	c.True(len(p.SubCommands) == 0)
 }
 
 func TestGetOptionsGitLsFiles(t *testing.T) {
@@ -26,6 +26,6 @@ func TestGetOptionsGitLsFiles(t *testing.T) {
 	err := p.Parse()
 	c.Nil(err)
 
-	opts := p.GetOptions()
-	c.True(len(opts) > 0)
+	c.True(len(p.Flags) > 0)
+	c.True(len(p.SubCommands) == 0)
 }

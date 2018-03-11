@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -22,31 +23,25 @@ var (
 
 // Parser is a parser for man pages
 type Parser struct {
-	path string
-	tags []*Tag
+	Name        string
+	path        string
+	tags        []*Tag
+	SubCommands []*SubCommand
+	Flags       []*Flag
 }
 
 // New creates a new Parser
-func New(path string) *Parser {
+func New(pagePath string) *Parser {
+	name := strings.Split(filepath.Base(pagePath), ".")[0]
 	parser := &Parser{
-		path: path,
-		tags: []*Tag{},
+		Name:        name,
+		path:        pagePath,
+		tags:        []*Tag{},
+		SubCommands: []*SubCommand{},
+		Flags:       []*Flag{},
 	}
 
 	return parser
-}
-
-// GetOptions gets the options from the man page
-func (p *Parser) GetOptions() map[string]string {
-	opts := map[string]string{}
-
-	for _, tag := range p.tags {
-		for opt, desc := range tag.ToOptions() {
-			opts[opt] = desc
-		}
-	}
-
-	return opts
 }
 
 // Parse parses the man page
@@ -78,6 +73,9 @@ func (p *Parser) scanAndProcess(scanner *bufio.Scanner) error {
 	var section string
 
 	p.tags = []*Tag{}
+	p.Flags = []*Flag{}
+	p.SubCommands = []*SubCommand{}
+
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -96,7 +94,11 @@ func (p *Parser) scanAndProcess(scanner *bufio.Scanner) error {
 			if Debug {
 				fmt.Printf("Appending: %s %#v\n", section, content)
 			}
-			p.tags = append(p.tags, &Tag{Name: strings.ToUpper(section), Content: content})
+			tag := &Tag{Name: strings.ToUpper(section), Content: content}
+
+			p.Flags = append(p.Flags, tag.ToFlags()...)
+			p.SubCommands = append(p.SubCommands, tag.ToSubCommands()...)
+			p.tags = append(p.tags, tag)
 		}
 
 		if len(matches) > 1 {

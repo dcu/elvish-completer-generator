@@ -45,9 +45,12 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		opts := page.GetOptions()
-		for flag, desc := range opts {
-			fmt.Printf("%s: '%s'\n", flag, desc)
+		for _, sc := range page.SubCommands {
+			fmt.Printf("%s        %s\n", sc.Name, sc.Description)
+		}
+
+		for _, flag := range page.Flags {
+			fmt.Printf("%s        %s\n", flag.Name, flag.Description)
 		}
 
 		return nil

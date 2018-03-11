@@ -17,26 +17,58 @@ type Tag struct {
 	Content []string
 }
 
-// ToOptions returns the flag and the description
-func (t *Tag) ToOptions() map[string]string {
-	result := map[string]string{}
+// ToSubCommands returns the sub command and the description
+func (t *Tag) ToSubCommands() []*SubCommand {
+	result := []*SubCommand{}
+	if !t.couldBeSubCommand() {
+		return result
+	}
+
 	opts := strings.Split(t.Content[0], ",")
 	content := strings.Join(t.Content[1:], " ")
 	for _, opt := range opts {
 		if Debug {
-			fmt.Printf("looking for flags or subcommands: %s\n", opt)
+			fmt.Printf("looking for subcommands: %s\n", opt)
 		}
 
-		if matches := flagRx.FindStringSubmatch(opt); len(matches) > 1 {
-			result[matches[1]] = strings.TrimSpace(content)
-			if Debug {
-				fmt.Printf("found flag %s\n", matches[1])
-			}
-		} else if matches := subCommandRx.FindStringSubmatch(opt); t.couldBeSubCommand() && len(matches) > 1 {
-			result[matches[1]] = strings.TrimSpace(content)
+		if matches := subCommandRx.FindStringSubmatch(opt); len(matches) > 1 {
 			if Debug {
 				fmt.Printf("found sub command %s\n", matches[1])
 			}
+
+			subCommand := &SubCommand{
+				Name:        matches[1],
+				Description: strings.TrimSpace(content),
+			}
+
+			result = append(result, subCommand)
+		}
+	}
+
+	return result
+}
+
+// ToFlags returns the flag and the description
+func (t *Tag) ToFlags() []*Flag {
+	result := []*Flag{}
+	opts := strings.Split(t.Content[0], ",")
+	content := strings.Join(t.Content[1:], " ")
+	for _, opt := range opts {
+		if Debug {
+			fmt.Printf("looking for flags: %s\n", opt)
+		}
+
+		if matches := flagRx.FindStringSubmatch(opt); len(matches) > 1 {
+			if Debug {
+				fmt.Printf("found flag %s\n", matches[1])
+			}
+
+			flag := &Flag{
+				Name:        matches[1],
+				Description: strings.TrimSpace(content),
+			}
+
+			result = append(result, flag)
 		}
 	}
 
