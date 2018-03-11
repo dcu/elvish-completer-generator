@@ -1,4 +1,4 @@
-package manpage
+package types
 
 // Flag defines a flag
 type Flag struct {

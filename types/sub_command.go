@@ -1,4 +1,4 @@
-package manpage
+package types
 
 // SubCommand defines a sub command
 type SubCommand struct {

@@ -1,9 +1,14 @@
-package manpage
+package types
 
 import (
 	"fmt"
 	"regexp"
 	"strings"
+)
+
+var (
+	// Debug enables/disables debugging
+	Debug bool
 )
 
 var (
