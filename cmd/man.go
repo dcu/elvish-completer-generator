@@ -37,7 +37,8 @@ to quickly create a Cobra application.`,
 			return errors.New("missing file name")
 		}
 
-		page := manpage.New(args[0])
+		path := manpage.FindPath(args[0])
+		page := manpage.New(path)
 
 		err := page.Parse()
 		if err != nil {

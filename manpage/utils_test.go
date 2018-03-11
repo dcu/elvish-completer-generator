@@ -18,3 +18,14 @@ func TestPaths(t *testing.T) {
 		c.Nil(err)
 	}
 }
+
+func TestFindPath(t *testing.T) {
+	c := require.New(t)
+
+	for _, name := range []string{"git", "cp", "cut"} {
+		path := FindPath(name)
+		stat, err := os.Stat(path)
+		c.Nil(err)
+		c.True(stat.Mode().IsRegular())
+	}
+}
