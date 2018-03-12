@@ -26,7 +26,7 @@ import (
 
 // manCmd represents the man command
 var manCmd = &cobra.Command{
-	Use:   "man",
+	Use:   "man <command>",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -36,7 +36,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return errors.New("missing file name")
+			return errors.New("missing command name")
 		}
 
 		path := manpage.FindPath(args[0])
