@@ -24,6 +24,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	_dontCompleteFiles       bool
+	_dontCompleteSubCommands bool
+)
+
 // manCmd represents the man command
 var manCmd = &cobra.Command{
 	Use:   "man <command>",
@@ -58,13 +63,15 @@ to quickly create a Cobra application.`,
 		}
 
 		fileName := page.Name + "-completer.elv"
-		f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0644)
+		f, err := os.Create(fileName)
 		if err != nil {
 			return err
 		}
 		defer func() { _ = f.Close() }()
 
 		gen := generator.New(page.Name, page.Flags, page.SubCommands)
+		gen.DontCompleteFiles = _dontCompleteFiles
+		gen.DontCompleteSubCommands = _dontCompleteSubCommands
 		err = gen.Render(f)
 		if err != nil {
 			return err
@@ -89,4 +96,6 @@ func init() {
 	// is called directly, e.g.:
 	manCmd.Flags().BoolVarP(&manpage.Debug, "debug", "d", false, "Enables debug mode")
 
+	manCmd.Flags().BoolVarP(&_dontCompleteFiles, "dont-complete-files", "F", false, "Disable auto-completing file names")
+	manCmd.Flags().BoolVarP(&_dontCompleteSubCommands, "dont-complete-subcommands", "s", false, "Disable auto-complete sub commands")
 }

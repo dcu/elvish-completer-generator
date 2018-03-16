@@ -10,9 +10,11 @@ import (
 
 // Generator defines a completer generator
 type Generator struct {
-	CommandName string
-	Flags       []*types.Flag
-	SubCommands []*types.SubCommand
+	CommandName             string
+	DontCompleteFiles       bool
+	DontCompleteSubCommands bool
+	Flags                   []*types.Flag
+	SubCommands             []*types.SubCommand
 }
 
 // New creates a new instance of a generator

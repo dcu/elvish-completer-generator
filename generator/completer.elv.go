@@ -35,8 +35,12 @@ fn compl [cmd @words]{
 	if (-is-flag $curr) {
 		build-flags
 	}
+	{{ if not .DontCompleteFiles }}
 	list-files $curr
+	{{ end }}
+	{{ if not .DontCompleteSubCommands }}
 	subcmds
+	{{ end }}
 }
 
 edit:completion:arg-completer[{{.CommandName}}] = $compl~
