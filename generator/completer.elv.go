@@ -26,8 +26,16 @@ fn -is-flag [f]{
     has-prefix $f -
 }
 
-fn compl [curr @words]{
-	build-flags
+fn list-files [curr]{
+	put $curr*[match-hidden][nomatch-ok]
+}
+
+fn compl [cmd @words]{
+	curr = $words[-1]
+	if (-is-flag $curr) {
+		build-flags
+	}
+	list-files $curr
 	subcmds
 }
 
